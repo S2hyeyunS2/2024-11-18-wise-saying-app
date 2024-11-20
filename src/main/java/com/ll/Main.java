@@ -1,6 +1,6 @@
 package com.ll;
 
-public class main { // Applicaiton이 일하도록 함
+public class Main { // Applicaiton이 일하도록 함
     public static void main(String[] args) {
 
         Container.init(); // 공통적으로 사용되는 것들을 모아두는 공간(Container) 초기화
