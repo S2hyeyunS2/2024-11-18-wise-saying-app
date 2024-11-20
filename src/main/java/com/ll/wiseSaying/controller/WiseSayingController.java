@@ -97,6 +97,6 @@ public class WiseSayingController {
         wiseSaying.setContent(content);
         wiseSaying.setAuthorName(authorName);
 
-        System.out.printf("%d번 명언이 수정되었습니다.\n", id);
+        System.out.printf(id+"번 명언이 수정되었습니다.\n");
     }
 }
