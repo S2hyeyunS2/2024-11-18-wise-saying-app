@@ -1,7 +1,6 @@
 package com.ll;
 
-
-import com.ll.system.controller.SystemController;
+import com.ll.system.SystemController;
 import com.ll.wiseSaying.controller.WiseSayingController;
 
 public class Application {
@@ -36,3 +35,5 @@ public class Application {
         }
     }
 }
+
+

@@ -1,7 +1,8 @@
 package com.ll;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+
 public class Rq {
     private String actionCode;
     private Map<String, String> params;
