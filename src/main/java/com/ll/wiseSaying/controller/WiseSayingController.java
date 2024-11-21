@@ -6,22 +6,18 @@ import com.ll.wiseSaying.entity.WiseSaying;
 import com.ll.wiseSaying.repository.WiseSayingRepository;
 
 import java.io.IOException;
+import java.util.List;
 
 public class WiseSayingController {
-    private long lastWiseSayingId;
+
     private final WiseSayingRepository repository;
 
     public WiseSayingController(WiseSayingRepository repository) {
         this.repository = repository;
-        try {
-            this.lastWiseSayingId = repository.load().size(); // 이미 존재하는 명언들의 수를 가져옴
-        } catch (IOException e) {
-            this.lastWiseSayingId = 0;
-        }
     }
 
     public void write() throws IOException { // 명언 등록
-        long id = lastWiseSayingId + 1; // id는 이전 마지막 id+1로 설정
+        long id = repository.loadLastId() + 1; // id는 이전 마지막 id+1로 설정
         System.out.print("명언 : ");
         String content = Container.getScanner().nextLine().trim();
         System.out.print("작가 : ");
@@ -30,22 +26,37 @@ public class WiseSayingController {
         WiseSaying wiseSaying = new WiseSaying(id, content, authorName);
         repository.add(wiseSaying); // 명언을 저장소에 추가
         System.out.printf("%d번 명언이 등록되었습니다.\n", id);
-        lastWiseSayingId = id;
     }
 
     public void list() throws IOException { // 명언 목록 출력
+        List<WiseSaying> wiseSayings = repository.load(); // 최신 데이터를 가져옴
+        if (wiseSayings.isEmpty()) {
+            System.out.println("등록된 명언이 없습니다.");
+            return;
+        }
+
         System.out.println("번호 / 작가 / 명언");
         System.out.println("-".repeat(30));
 
-        for (WiseSaying wiseSaying : repository.load()) {
-            System.out.printf("%d / %s / %s\n", wiseSaying.getId(), wiseSaying.getAuthorName(), wiseSaying.getContent());
-        }
+        wiseSayings.stream()
+                .sorted((a, b) -> Long.compare(b.getId(), a.getId())) // ID 기준 내림차순
+                .forEach(wiseSaying ->
+                        System.out.printf("%d / %s / %s\n",
+                                wiseSaying.getId(),
+                                wiseSaying.getAuthorName(),
+                                wiseSaying.getContent()));
+
     }
 
     public void remove(Rq rq) throws IOException { // 명언 삭제
         int id = rq.getIntParam("id", -1);
         if (id == -1) {
             System.out.println("id(정수)를 입력해주세요.");
+            return;
+        }
+
+        if (!repository.exists(id)) { // ID가 존재하지 않으면 메시지 출력
+            System.out.printf("%d번 명언은 존재하지 않습니다.\n", id);
             return;
         }
 
@@ -60,11 +71,17 @@ public class WiseSayingController {
             return;
         }
 
-        System.out.printf("수정할 명언 %d번을 찾았습니다.\n", id);
+        if (!repository.exists(id)) { // ID가 존재하지 않으면 메시지 출력
+            System.out.printf("%d번 명언은 존재하지 않습니다.\n", id);
+            return;
+        }
 
+        WiseSaying wiseSaying = repository.findById(id);
+        System.out.printf("명언(기존) : %s\n", wiseSaying.getContent());
         System.out.print("새 명언 : ");
         String newContent = Container.getScanner().nextLine().trim();
 
+        System.out.printf("작가(기존) : %s\n", wiseSaying.getAuthorName());
         System.out.print("새 작가 : ");
         String newAuthorName = Container.getScanner().nextLine().trim();
 

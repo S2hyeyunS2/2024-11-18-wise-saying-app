@@ -5,6 +5,10 @@ public class WiseSaying {
     private String content;
     private String authorName;
 
+    public WiseSaying() {
+
+    }
+
     public WiseSaying(long id, String content, String authorName){
         this.id=id;
         this.content=content;
@@ -30,5 +34,8 @@ public class WiseSaying {
         this.authorName=authorName;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
 }
 

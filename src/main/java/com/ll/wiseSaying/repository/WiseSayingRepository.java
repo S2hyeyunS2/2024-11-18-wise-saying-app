@@ -1,58 +1,96 @@
 package com.ll.wiseSaying.repository;
 
-import com.ll.wiseSaying.entity.WiseSaying;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ll.wiseSaying.entity.WiseSaying;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WiseSayingRepository {
-    private static final String FILE_NAME = "wise_sayings.json";
-    private ObjectMapper objectMapper;
+    private final String BASE_DIR = "db/wiseSaying";
+    private final String LAST_ID_FILE = BASE_DIR + "/lastId.txt";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public WiseSayingRepository() {
-        objectMapper = new ObjectMapper();
+        ensureBaseDirectoryExists();
     }
 
-    // 파일에서 명언들을 불러오기
+    private void ensureBaseDirectoryExists() {
+        File baseDir = new File(BASE_DIR);
+        if (!baseDir.exists()) {
+            baseDir.mkdirs();
+        }
+    }
+
+    public void saveLastId(long lastId) throws IOException {
+        Files.writeString(Paths.get(LAST_ID_FILE), String.valueOf(lastId));
+    }
+
+    public long loadLastId() throws IOException {
+        if (!Files.exists(Paths.get(LAST_ID_FILE))) {
+            return 0;
+        }
+        String content = Files.readString(Paths.get(LAST_ID_FILE)).trim();
+        return Long.parseLong(content);
+    }
+
     public List<WiseSaying> load() throws IOException {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            return new ArrayList<>(); // 파일이 없다면 빈 리스트 반환
+        List<WiseSaying> wiseSayings = new ArrayList<>();
+        File[] files = new File(BASE_DIR).listFiles((dir, name) -> name.endsWith(".json"));
+        if (files == null) return wiseSayings;
+
+        for (File file : files) {
+            WiseSaying wiseSaying = objectMapper.readValue(file, WiseSaying.class);
+            wiseSayings.add(wiseSaying);
         }
-        return objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(List.class, WiseSaying.class));
+
+        wiseSayings.sort((a, b) -> Long.compare(a.getId(), b.getId()));
+        return wiseSayings;
     }
 
-    // 명언을 파일에 저장하기
-    public void save(List<WiseSaying> wiseSayings) throws IOException {
-        objectMapper.writeValue(new File(FILE_NAME), wiseSayings);
-    }
-
-    // 명언을 하나 추가
     public void add(WiseSaying wiseSaying) throws IOException {
-        List<WiseSaying> wiseSayings = load();
-        wiseSayings.add(wiseSaying);
-        save(wiseSayings);
+        File file = new File(BASE_DIR + "/" + wiseSaying.getId() + ".json");
+        objectMapper.writeValue(file, wiseSaying);
+        saveLastId(wiseSaying.getId());
     }
 
-    // 명언 삭제
-    public void remove(long id) throws IOException {
-        List<WiseSaying> wiseSayings = load();
-        wiseSayings.removeIf(wiseSaying -> wiseSaying.getId() == id);
-        save(wiseSayings);
-    }
-
-    // 명언 수정
     public void modify(long id, String newContent, String newAuthorName) throws IOException {
-        List<WiseSaying> wiseSayings = load();
-        for (WiseSaying wiseSaying : wiseSayings) {
-            if (wiseSaying.getId() == id) {
-                wiseSaying.setContent(newContent);
-                wiseSaying.setAuthorName(newAuthorName);
-                save(wiseSayings);
-                break;
-            }
+        File file = new File(BASE_DIR + "/" + id + ".json");
+        if (!file.exists()) {
+            System.out.println("해당 ID의 명언이 존재하지 않습니다.");
+            return;
         }
+
+        WiseSaying wiseSaying = objectMapper.readValue(file, WiseSaying.class);
+        wiseSaying.setContent(newContent);
+        wiseSaying.setAuthorName(newAuthorName);
+        objectMapper.writeValue(file, wiseSaying);
+    }
+
+    public boolean exists(long id) {
+        File file = new File(BASE_DIR + "/" + id + ".json");
+        return file.exists();
+    }
+
+    public WiseSaying findById(long id) throws IOException {
+        File file = new File(BASE_DIR + "/" + id + ".json");
+        if (!file.exists()) {
+            return null;
+        }
+        return objectMapper.readValue(file, WiseSaying.class);
+    }
+
+    public void remove(long id) throws IOException {
+        File file = new File(BASE_DIR + "/" + id + ".json");
+        if (!file.exists()) {
+            System.out.println("해당 ID의 명언이 존재하지 않습니다.");
+            return;
+        }
+
+        file.delete();
     }
 }
