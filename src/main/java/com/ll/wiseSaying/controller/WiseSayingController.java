@@ -1,16 +1,19 @@
 package com.ll.wiseSaying.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.Container;
 import com.ll.Rq;
 import com.ll.wiseSaying.entity.WiseSaying;
 import com.ll.wiseSaying.repository.WiseSayingRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class WiseSayingController {
 
     private final WiseSayingRepository repository;
+    private final ObjectMapper objectMapper=new ObjectMapper();
 
     public WiseSayingController(WiseSayingRepository repository) {
         this.repository = repository;
@@ -87,5 +90,12 @@ public class WiseSayingController {
 
         repository.modify(id, newContent, newAuthorName);
         System.out.printf("%d번 명언이 수정되었습니다.\n", id);
+    }
+
+    public void build() throws IOException{
+        List<WiseSaying> wiseSayings=repository.load();
+        File file=new File("db/wiseSaying/data.json");
+        objectMapper.writeValue(file,wiseSayings);
+        System.out.println("data.json 파일의 내용이 갱신되었습니다.");
     }
 }
