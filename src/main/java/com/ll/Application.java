@@ -51,6 +51,12 @@ public class Application {
                         System.out.println("수정 오류: " + e.getMessage());
                     }
                     break;
+                case "빌드":
+                    try{
+                        wiseSayingController.build();
+                    } catch (IOException e){
+                        System.out.println("빌드 오류: "+ e.getMessage());
+                    }
             }
         }
     }

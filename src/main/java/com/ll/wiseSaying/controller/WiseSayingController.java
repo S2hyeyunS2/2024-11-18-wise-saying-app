@@ -95,7 +95,7 @@ public class WiseSayingController {
     public void build() throws IOException{
         List<WiseSaying> wiseSayings=repository.load();
         File file=new File("db/wiseSaying/data.json");
-        objectMapper.writeValue(file,wiseSayings);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(file,wiseSayings);
         System.out.println("data.json 파일의 내용이 갱신되었습니다.");
     }
 }
