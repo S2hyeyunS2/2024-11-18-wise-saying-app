@@ -3,6 +3,7 @@ package com.ll;
 import com.ll.system.SystemController;
 import com.ll.wiseSaying.controller.WiseSayingController;
 import com.ll.wiseSaying.repository.WiseSayingRepository;
+import com.ll.wiseSaying.service.WiseSayingService;
 
 import java.io.IOException;
 
@@ -12,7 +13,8 @@ public class Application {
 
         SystemController systemController = new SystemController();
         WiseSayingRepository repository = new WiseSayingRepository();
-        WiseSayingController wiseSayingController = new WiseSayingController(repository);
+        WiseSayingService wiseSayingService = new WiseSayingService(repository);
+        WiseSayingController wiseSayingController = new WiseSayingController(wiseSayingService);
 
         while (true) {
             System.out.print("명령) ");
@@ -52,10 +54,10 @@ public class Application {
                     }
                     break;
                 case "빌드":
-                    try{
+                    try {
                         wiseSayingController.build();
-                    } catch (IOException e){
-                        System.out.println("빌드 오류: "+ e.getMessage());
+                    } catch (IOException e) {
+                        System.out.println("빌드 오류: " + e.getMessage());
                     }
             }
         }

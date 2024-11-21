@@ -60,11 +60,6 @@ public class WiseSayingRepository {
 
     public void modify(long id, String newContent, String newAuthorName) throws IOException {
         File file = new File(BASE_DIR + "/" + id + ".json");
-        if (!file.exists()) {
-            System.out.println("해당 ID의 명언이 존재하지 않습니다.");
-            return;
-        }
-
         WiseSaying wiseSaying = objectMapper.readValue(file, WiseSaying.class);
         wiseSaying.setContent(newContent);
         wiseSaying.setAuthorName(newAuthorName);
@@ -84,13 +79,22 @@ public class WiseSayingRepository {
         return objectMapper.readValue(file, WiseSaying.class);
     }
 
+    public void save(List<WiseSaying> wiseSayings) throws IOException {
+        for (WiseSaying wiseSaying : wiseSayings) {
+            File file = new File(BASE_DIR + "/" + wiseSaying.getId() + ".json");
+            objectMapper.writeValue(file, wiseSaying);
+        }
+        if (!wiseSayings.isEmpty()) {
+            saveLastId(wiseSayings.get(wiseSayings.size() - 1).getId());
+        }
+    }
+
     public void remove(long id) throws IOException {
         File file = new File(BASE_DIR + "/" + id + ".json");
-        if (!file.exists()) {
-            System.out.println("해당 ID의 명언이 존재하지 않습니다.");
-            return;
-        }
-
         file.delete();
+    }
+
+    public void build(List<WiseSaying> wiseSayings) throws IOException {
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(BASE_DIR + "/data.json"), wiseSayings);
     }
 }
