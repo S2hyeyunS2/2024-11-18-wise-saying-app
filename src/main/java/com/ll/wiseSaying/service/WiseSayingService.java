@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class WiseSayingService {
-
     private final WiseSayingRepository repository;
 
     public WiseSayingService(WiseSayingRepository repository) {
@@ -15,10 +14,11 @@ public class WiseSayingService {
     }
 
     public long create(String content, String authorName) throws IOException {
-        long id = repository.loadLastId() + 1;
-        WiseSaying wiseSaying = new WiseSaying(id, content, authorName);
-        repository.add(wiseSaying);
-        return id;
+        long lastId=repository.loadLastId();
+        long newId=lastId +1;
+
+        WiseSaying wiseSaying=new WiseSaying(newId,content,authorName);
+        return repository.save(wiseSaying);
     }
 
 
@@ -45,8 +45,7 @@ public class WiseSayingService {
     }
 
     public void build() throws IOException {
-        List<WiseSaying> wiseSayings = repository.load();
-        //repository.save(wiseSayings);
-        repository.build(wiseSayings);
+        List<WiseSaying> wiseSayings = repository.load(); // 숫자.json 파일에서 데이터 로드
+        repository.build(wiseSayings); // data.json 갱신
     }
 }

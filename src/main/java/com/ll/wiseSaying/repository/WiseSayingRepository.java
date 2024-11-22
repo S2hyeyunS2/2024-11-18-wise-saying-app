@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class WiseSayingRepository {
@@ -41,16 +40,17 @@ public class WiseSayingRepository {
 
     public List<WiseSaying> load() throws IOException {
         List<WiseSaying> wiseSayings = new ArrayList<>();
-        File file = new File(BASE_DIR + "/data.json");
 
-        if (!file.exists()) {
-            return wiseSayings;
+        File baseDir=new File(BASE_DIR);
+        File[] files =baseDir.listFiles((dir,name)-> name.matches("\\d+\\.json"));
+        if(files !=null){
+            for(File file : files){
+                WiseSaying wiseSaying = objectMapper.readValue(file,WiseSaying.class);
+                wiseSayings.add(wiseSaying);
+            }
         }
 
-        // JSON 배열을 리스트로 역직렬화
-        wiseSayings = Arrays.asList(objectMapper.readValue(file, WiseSaying[].class));
-
-        wiseSayings.sort((a, b) -> Long.compare(a.getId(), b.getId())); // ID 기준 정렬
+        wiseSayings.sort((a,b)-> Long.compare(a.getId(),b.getId()));
         return wiseSayings;
     }
 
@@ -81,14 +81,11 @@ public class WiseSayingRepository {
         return objectMapper.readValue(file, WiseSaying.class);
     }
 
-    public void save(List<WiseSaying> wiseSayings) throws IOException {
-        for (WiseSaying wiseSaying : wiseSayings) {
-            File file = new File(BASE_DIR + "/" + wiseSaying.getId() + ".json");
-            objectMapper.writeValue(file, wiseSaying);
-        }
-        if (!wiseSayings.isEmpty()) {
-            saveLastId(wiseSayings.get(wiseSayings.size() - 1).getId());
-        }
+    public long save(WiseSaying wiseSaying) throws IOException {
+        File file = new File(BASE_DIR + "/" + wiseSaying.getId() + ".json");
+        objectMapper.writeValue(file, wiseSaying);
+        saveLastId(wiseSaying.getId());
+        return wiseSaying.getId(); // 저장된 명언의 ID 반환
     }
 
     public void remove(long id) throws IOException {
