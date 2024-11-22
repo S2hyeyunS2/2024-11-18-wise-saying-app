@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WiseSayingRepository {
@@ -40,15 +41,16 @@ public class WiseSayingRepository {
 
     public List<WiseSaying> load() throws IOException {
         List<WiseSaying> wiseSayings = new ArrayList<>();
-        File[] files = new File(BASE_DIR).listFiles((dir, name) -> name.endsWith(".json"));
-        if (files == null) return wiseSayings;
+        File file = new File(BASE_DIR + "/data.json");
 
-        for (File file : files) {
-            WiseSaying wiseSaying = objectMapper.readValue(file, WiseSaying.class);
-            wiseSayings.add(wiseSaying);
+        if (!file.exists()) {
+            return wiseSayings;
         }
 
-        wiseSayings.sort((a, b) -> Long.compare(a.getId(), b.getId()));
+        // JSON 배열을 리스트로 역직렬화
+        wiseSayings = Arrays.asList(objectMapper.readValue(file, WiseSaying[].class));
+
+        wiseSayings.sort((a, b) -> Long.compare(a.getId(), b.getId())); // ID 기준 정렬
         return wiseSayings;
     }
 
@@ -95,6 +97,8 @@ public class WiseSayingRepository {
     }
 
     public void build(List<WiseSaying> wiseSayings) throws IOException {
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(BASE_DIR + "/data.json"), wiseSayings);
+        objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValue(new File(BASE_DIR + "/data.json"), wiseSayings);
     }
+
 }
