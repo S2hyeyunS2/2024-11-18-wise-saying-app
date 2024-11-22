@@ -2,6 +2,7 @@ package com.ll;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Arrays;
 
 public class Rq {
     private String actionCode;
@@ -17,16 +18,11 @@ public class Rq {
 
         String[] paramsBits = commandBits[1].split("&");
 
-        for (String paramStr : paramsBits) {
-            String[] paramStrBits = paramStr.split("=", 2);
-
-            if (paramStrBits.length == 1) continue;
-
-            String key = paramStrBits[0];
-            String value = paramStrBits[1];
-
-            params.put(key, value);
-        }
+        // Stream API로 params 맵 초기화
+        Arrays.stream(paramsBits)
+                .map(paramStr -> paramStr.split("=", 2)) // paramStr를 "=" 기준으로 나눔
+                .filter(paramStrBits -> paramStrBits.length == 2) // 길이가 2인 배열만 필터링
+                .forEach(paramStrBits -> params.put(paramStrBits[0], paramStrBits[1])); // 키와 값을 맵에 추가
     }
 
     public String getActionCode() {
@@ -41,7 +37,7 @@ public class Rq {
         try {
             return Integer.parseInt(getParam(name));
         } catch (NumberFormatException e) {
-
+            // 기본값 반환
         }
         return defaultValue;
     }
