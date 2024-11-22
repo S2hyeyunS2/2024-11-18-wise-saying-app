@@ -46,6 +46,7 @@ public class WiseSayingService {
 
     public void build() throws IOException {
         List<WiseSaying> wiseSayings = repository.load();
-        repository.save(wiseSayings);
+        //repository.save(wiseSayings);
+        repository.build(wiseSayings);
     }
 }
