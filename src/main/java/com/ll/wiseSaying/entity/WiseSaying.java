@@ -38,4 +38,3 @@ public class WiseSaying {
         this.id = id;
     }
 }
-
