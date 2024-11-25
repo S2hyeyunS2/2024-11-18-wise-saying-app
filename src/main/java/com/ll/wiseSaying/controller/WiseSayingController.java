@@ -50,6 +50,25 @@ public class WiseSayingController {
             return;
         }
 
+        int page=rq.getPageParam();
+        int itemsPerpage=5;
+        int totalItems=wiseSayings.size();
+        int totalPages=(int) Math.ceil((double) totalItems/itemsPerpage);
+
+        //유효한 페이지 번호 확인
+        if(page<1 || page>totalPages){
+            System.out.printf("잘못된 페이지 번호입니다. 페이지는 1부터 %d까지 가능합니다.\n",totalPages);
+            return;
+        }
+
+        int startIndex=(page-1)*itemsPerpage;
+        int endIndex=Math.min(startIndex+itemsPerpage,totalItems);
+
+        System.out.println("----------------------");
+        System.out.println("번호 / 작가 / 명언");
+        System.out.println("----------------------");
+
+
         System.out.println("----------------------");
         System.out.printf("검색타입 : %s\n", keywordType != null ? keywordType : "전체");
         System.out.printf("검색어 : %s\n", keyword != null ? keyword : "없음");
@@ -61,6 +80,17 @@ public class WiseSayingController {
                 .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
                 .forEach(wiseSaying -> System.out.printf("%d / %s / %s\n",
                         wiseSaying.getId(), wiseSaying.getAuthorName(), wiseSaying.getContent()));
+
+        System.out.println("----------------------");
+        for (int i = 1; i <= totalPages; i++) {
+            if (i == page) {
+                System.out.printf("[%d] ", i);
+            } else {
+                System.out.printf("%d ", i);
+            }
+        }
+        System.out.println();
+
     }
 
     public void remove(Rq rq) throws IOException { // 명언 삭제

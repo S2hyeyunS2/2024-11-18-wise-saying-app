@@ -8,6 +8,7 @@ import java.util.List;
 
 public class WiseSayingService {
     private final WiseSayingRepository repository;
+    private List<WiseSaying> wiseSayings;
 
     public WiseSayingService(WiseSayingRepository repository) {
         this.repository = repository;

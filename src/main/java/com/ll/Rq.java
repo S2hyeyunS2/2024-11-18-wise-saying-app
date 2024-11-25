@@ -25,6 +25,10 @@ public class Rq {
                 .forEach(paramStrBits -> params.put(paramStrBits[0], paramStrBits[1])); // 키와 값을 맵에 추가
     }
 
+    public int getPageParam(){
+        return getIntParam("page",1);
+    }
+
     public String getActionCode() {
         return actionCode;
     }
