@@ -51,9 +51,9 @@ public class WiseSayingController {
         }
 
         int page=rq.getPageParam();
-        int itemsPerpage=5;
+        int itemsPerPage = 5;
         int totalItems=wiseSayings.size();
-        int totalPages=(int) Math.ceil((double) totalItems/itemsPerpage);
+        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
 
         //유효한 페이지 번호 확인
         if(page<1 || page>totalPages){
@@ -61,13 +61,10 @@ public class WiseSayingController {
             return;
         }
 
-        int startIndex=(page-1)*itemsPerpage;
-        int endIndex=Math.min(startIndex+itemsPerpage,totalItems);
+        int startIndex = (page - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, totalItems);
 
-        System.out.println("----------------------");
-        System.out.println("번호 / 작가 / 명언");
-        System.out.println("----------------------");
-
+        List<WiseSaying> pageinatedWiseSayings=wiseSayings.subList(startIndex,endIndex);
 
         System.out.println("----------------------");
         System.out.printf("검색타입 : %s\n", keywordType != null ? keywordType : "전체");
@@ -76,7 +73,7 @@ public class WiseSayingController {
         System.out.println("번호 / 작가 / 명언");
         System.out.println("----------------------");
 
-        wiseSayings.stream()
+        pageinatedWiseSayings.stream()
                 .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
                 .forEach(wiseSaying -> System.out.printf("%d / %s / %s\n",
                         wiseSaying.getId(), wiseSaying.getAuthorName(), wiseSaying.getContent()));
