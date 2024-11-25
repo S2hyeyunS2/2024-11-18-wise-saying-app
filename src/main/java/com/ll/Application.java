@@ -32,13 +32,6 @@ public class Application {
                         System.out.println("등록 오류: " + e.getMessage());
                     }
                     break;
-                case "목록":
-                    try {
-                        wiseSayingController.list();
-                    } catch (IOException e) {
-                        System.out.println("목록 조회 오류: " + e.getMessage());
-                    }
-                    break;
                 case "삭제":
                     try {
                         wiseSayingController.remove(rq);
@@ -51,6 +44,13 @@ public class Application {
                         wiseSayingController.modify(rq);
                     } catch (IOException e) {
                         System.out.println("수정 오류: " + e.getMessage());
+                    }
+                    break;
+                case "목록":
+                    try{
+                        wiseSayingController.list(rq);
+                    }catch(IOException e){
+                        System.out.println("목록 조회 오류:" + e.getMessage());
                     }
                     break;
                 case "빌드":

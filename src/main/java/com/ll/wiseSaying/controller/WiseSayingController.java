@@ -26,16 +26,36 @@ public class WiseSayingController {
         System.out.printf(id+"번 명언이 등록되었습니다.\n");
     }
 
-    public void list() throws IOException { // 명언 목록 출력
+    public void list(Rq rq) throws IOException { // 명언 목록 출력
         List<WiseSaying> wiseSayings=wiseSayingService.list();
 
-        if(wiseSayings.isEmpty()){
-            System.out.println("등록된 명언이 없습니다.");
+        String keywordType=rq.getParam("keywordType");
+        String keyword=rq.getParam("keyword");
+
+        if (keywordType != null && keyword != null) {
+            wiseSayings = wiseSayings.stream()
+                    .filter(wiseSaying -> {
+                        if (keywordType.equals("content")) {
+                            return wiseSaying.getContent().contains(keyword);
+                        } else if (keywordType.equals("author")) {
+                            return wiseSaying.getAuthorName().contains(keyword);
+                        }
+                        return false;
+                    })
+                    .toList();
+        }
+
+        if (wiseSayings.isEmpty()) {
+            System.out.println("검색 결과가 없습니다.");
             return;
         }
 
+        System.out.println("----------------------");
+        System.out.printf("검색타입 : %s\n", keywordType != null ? keywordType : "전체");
+        System.out.printf("검색어 : %s\n", keyword != null ? keyword : "없음");
+        System.out.println("----------------------");
         System.out.println("번호 / 작가 / 명언");
-        System.out.println("-".repeat(30));
+        System.out.println("----------------------");
 
         wiseSayings.stream()
                 .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
